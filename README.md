@@ -1,5 +1,12 @@
 # Video Transform Studio
 
+[![Stars](https://img.shields.io/github/stars/sijanstu/video-transform-studio?style=flat)](https://github.com/sijanstu/video-transform-studio/stargazers)
+[![Forks](https://img.shields.io/github/forks/sijanstu/video-transform-studio?style=flat)](https://github.com/sijanstu/video-transform-studio/network/members)
+[![Issues](https://img.shields.io/github/issues/sijanstu/video-transform-studio)](https://github.com/sijanstu/video-transform-studio/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/sijanstu/video-transform-studio)](https://github.com/sijanstu/video-transform-studio/commits/main)
+[![Repo Size](https://img.shields.io/github/repo-size/sijanstu/video-transform-studio)](https://github.com/sijanstu/video-transform-studio)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org)
+
 A small Python + FFmpeg web app for applying creative video edits — mirroring,
 picture-in-picture, color grading, micro zoom/shake, pitch & speed changes,
 frame thinning, and intro title cards — with a live in-browser preview.
@@ -82,3 +89,7 @@ fx.run(cmd)
 
 `build_command` returns an `ffmpeg` argument list; pass `limit_seconds` for a
 short preview, omit it for a full export.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=sijanstu/video-transform-studio&type=Date)](https://star-history.com/#sijanstu/video-transform-studio&Date)
