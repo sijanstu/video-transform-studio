@@ -107,4 +107,9 @@ def output(name):
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    import os
+    # In production this file is served by gunicorn (see Dockerfile).
+    # `flask run` / debug is only for local development.
+    debug = os.environ.get("FLASK_DEBUG") == "1"
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=debug)

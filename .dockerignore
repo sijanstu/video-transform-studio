@@ -1,0 +1,11 @@
+.git
+.gitignore
+__pycache__/
+*.py[cod]
+.idea/
+.DS_Store
+uploads/*
+outputs/*
+*.card.png
+sample.mp4
+chk_*.mp4
