@@ -16,4 +16,8 @@ COPY . .
 ENV PORT=7860
 EXPOSE 7860
 
+# Lets orchestrators (Coolify, Docker, etc.) confirm the server is up.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD wget -qO- http://localhost:${PORT}/ >/dev/null 2>&1 || exit 1
+
 CMD gunicorn --bind 0.0.0.0:${PORT} --workers 1 --timeout 300 app:app

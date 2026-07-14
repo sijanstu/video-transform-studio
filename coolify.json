@@ -1,0 +1,22 @@
+{
+  "version": "v4",
+  "services": [
+    {
+      "name": "video-transform-studio",
+      "type": "app",
+      "build_pack": "dockerfile",
+      "dockerfile": "Dockerfile",
+      "dockerfile_location": "./",
+      "ports": [
+        {
+          "host": 7860,
+          "published": 7860
+        }
+      ],
+      "health_check": {
+        "path": "/",
+        "port": 7860
+      }
+    }
+  ]
+}
