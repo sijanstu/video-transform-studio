@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+
+# User content (uploaded sources & rendered output)
+uploads/*
+!uploads/.gitkeep
+outputs/*
+!outputs/.gitkeep
+
+# Generated title-card images
+*.card.png
+
+# Local test artifacts
+sample.mp4
+chk_*.mp4

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Video Transform Studio</title>
+<style>
+  :root { --bg:#0f1115; --panel:#1a1d24; --line:#2a2f3a; --txt:#e7e9ee;
+          --mut:#9aa3b2; --acc:#5b8cff; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif;
+         background:var(--bg); color:var(--txt); }
+  header { padding:16px 20px; border-bottom:1px solid var(--line); }
+  header h1 { margin:0; font-size:18px; }
+  header p { margin:4px 0 0; color:var(--mut); font-size:12px; }
+  .wrap { display:grid; grid-template-columns:340px 1fr; gap:16px; padding:16px; }
+  @media (max-width:880px){ .wrap{grid-template-columns:1fr;} }
+  .panel { background:var(--panel); border:1px solid var(--line);
+           border-radius:10px; padding:14px; }
+  .group { border:1px solid var(--line); border-radius:8px; padding:10px;
+           margin-bottom:12px; }
+  .group h3 { margin:0 0 8px; font-size:12px; text-transform:uppercase;
+              letter-spacing:.06em; color:var(--mut); }
+  label { display:flex; align-items:center; justify-content:space-between;
+          gap:10px; margin:7px 0; }
+  label span:first-child { color:var(--mut); }
+  input[type=range]{ width:140px; }
+  input[type=number], input[type=text]{ width:120px; background:#0c0e12;
+        color:var(--txt); border:1px solid var(--line); border-radius:6px;
+        padding:4px 6px; }
+  .switch{ display:flex; align-items:center; gap:8px; }
+  button { background:var(--acc); color:#fff; border:0; border-radius:8px;
+           padding:10px 14px; font-weight:600; cursor:pointer; }
+  button.secondary{ background:#2a2f3a; }
+  button:disabled{ opacity:.5; cursor:not-allowed; }
+  .row{ display:flex; gap:10px; }
+  video { width:100%; background:#000; border-radius:8px; max-height:70vh; }
+  .preview-meta{ color:var(--mut); font-size:12px; margin-top:8px; }
+  .status{ margin-top:10px; font-size:13px; min-height:18px; }
+  .status.err{ color:#ff7a7a; }
+  a.dl{ color:var(--acc); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Video Transform Studio</h1>
+  <p>Apply creative edits to your own or licensed footage. For original content &amp; fair-use commentary.</p>
+</header>
+
+<div class="wrap">
+  <!-- CONTROLS -->
+  <div class="panel">
+    <div class="group">
+      <h3>Source</h3>
+      <input type="file" id="file" accept="video/*" />
+      <div class="preview-meta" id="fileInfo"></div>
+    </div>
+
+    <div class="group">
+      <h3>Visual</h3>
+      <label class="switch"><span>Mirror (flip)</span>
+        <input type="checkbox" id="mirror"></label>
+      <label class="switch"><span>Picture-in-Picture</span>
+        <input type="checkbox" id="pip"></label>
+      <label><span>PiP size</span>
+        <input type="range" id="pip_scale" min="0.2" max="0.8" step="0.05" value="0.45">
+        <span id="pip_scale_v"></span></label>
+      <label><span>Saturation</span>
+        <input type="range" id="color_saturation" min="0" max="2" step="0.05" value="1"></label>
+      <label><span>Hue shift°</span>
+        <input type="range" id="color_hue" min="-180" max="180" step="1" value="0"></label>
+      <label><span>Vignette</span>
+        <input type="range" id="vignette" min="0" max="1" step="0.05" value="0"></label>
+      <label><span>Zoom</span>
+        <input type="range" id="zoom" min="1" max="1.3" step="0.01" value="1"></label>
+      <label class="switch"><span>Shake</span>
+        <input type="checkbox" id="shake"></label>
+    </div>
+
+    <div class="group">
+      <h3>Audio</h3>
+      <label><span>Pitch</span>
+        <input type="range" id="pitch" min="0.85" max="1.15" step="0.005" value="1"></label>
+      <label><span>Speed</span>
+        <input type="range" id="speed" min="0.85" max="1.2" step="0.01" value="1"></label>
+    </div>
+
+    <div class="group">
+      <h3>Structural</h3>
+      <label><span>Frame skip (every N)</span>
+        <input type="number" id="frame_skip" min="0" max="30" step="1" value="0"></label>
+      <label><span>Intro card (s)</span>
+        <input type="range" id="intro_seconds" min="0" max="10" step="0.5" value="0"></label>
+      <label><span>Intro text</span>
+        <input type="text" id="intro_text" value="Your Title"></label>
+    </div>
+
+    <div class="row">
+      <button id="previewBtn">Preview (8s)</button>
+      <button id="exportBtn" class="secondary">Export</button>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="panel">
+    <video id="player" controls></video>
+    <div class="preview-meta" id="outMeta"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let vidId = null;
+
+function syncLabels(){
+  $("pip_scale_v").textContent = (+$("pip_scale").value).toFixed(2);
+}
+["pip_scale"].forEach(id => $(id).addEventListener("input", syncLabels));
+syncLabels();
+
+$("file").addEventListener("change", async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const fd = new FormData();
+  fd.append("file", f);
+  setStatus("Uploading…");
+  const r = await fetch("/upload", {method:"POST", body:fd});
+  const j = await r.json();
+  if (!r.ok){ setStatus(j.error || "upload failed", true); return; }
+  vidId = j.id;
+  const i = j.info;
+  $("fileInfo").textContent =
+    `${i.width}×${i.height} · ${i.fps.toFixed(1)}fps · ${i.duration.toFixed(1)}s`
+    + (i.has_audio ? " · audio" : " · no audio");
+  setStatus("Ready.");
+});
+
+function collect(){
+  const v = id => $(id).value;
+  return {
+    mirror: $("mirror").checked,
+    pip: $("pip").checked,
+    pip_scale: +v("pip_scale"),
+    color_saturation: +v("color_saturation"),
+    color_hue: +v("color_hue"),
+    vignette: +v("vignette"),
+    zoom: +v("zoom"),
+    shake: $("shake").checked,
+    pitch: +v("pitch"),
+    speed: +v("speed"),
+    frame_skip: +v("frame_skip"),
+    intro_seconds: +v("intro_seconds"),
+    intro_text: v("intro_text"),
+  };
+}
+
+async function render(mode){
+  if (!vidId){ setStatus("Upload a video first.", true); return; }
+  const btn = mode === "preview" ? $("previewBtn") : $("exportBtn");
+  btn.disabled = true;
+  setStatus(mode === "preview" ? "Rendering preview…" : "Exporting (this can take a while)…");
+  try {
+    const r = await fetch("/render", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({id:vidId, mode, params:collect()})
+    });
+    const j = await r.json();
+    if (!r.ok){ setStatus(j.error || "render failed", true); return; }
+    const player = $("player");
+    player.src = j.url + "?t=" + Date.now();
+    player.load();
+    $("outMeta").textContent = mode === "export"
+      ? `Export ready · <a class="dl" href="${j.url}" download>Download</a>`
+      : "Preview ready (first 8s).";
+    setStatus("Done.");
+  } catch(err){
+    setStatus(String(err), true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function setStatus(msg, isErr){
+  const s = $("status");
+  s.textContent = msg;
+  s.className = "status" + (isErr ? " err" : "");
+}
+
+$("previewBtn").addEventListener("click", () => render("preview"));
+$("exportBtn").addEventListener("click", () => render("export"));
+</script>
+</body>
+</html>
