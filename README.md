@@ -1,11 +1,11 @@
 # Video Transform Studio
 
-[![Stars](https://img.shields.io/github/stars/sijanstu/video-transform-studio?style=flat)](https://github.com/sijanstu/video-transform-studio/stargazers)
-[![Forks](https://img.shields.io/github/forks/sijanstu/video-transform-studio?style=flat)](https://github.com/sijanstu/video-transform-studio/network/members)
-[![Issues](https://img.shields.io/github/issues/sijanstu/video-transform-studio)](https://github.com/sijanstu/video-transform-studio/issues)
-[![Last Commit](https://img.shields.io/github/last-commit/sijanstu/video-transform-studio)](https://github.com/sijanstu/video-transform-studio/commits/main)
-[![Repo Size](https://img.shields.io/github/repo-size/sijanstu/video-transform-studio)](https://github.com/sijanstu/video-transform-studio)
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org)
+![Stars](badges/stars.svg)
+![Forks](badges/forks.svg)
+![Issues](badges/issues.svg)
+![Last Commit](badges/last-commit.svg)
+![Repo Size](badges/size.svg)
+![Python](badges/python.svg)
 
 A small Python + FFmpeg web app for applying creative video edits — mirroring,
 picture-in-picture, color grading, micro zoom/shake, pitch & speed changes,
@@ -92,4 +92,8 @@ short preview, omit it for a full export.
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=sijanstu/video-transform-studio&type=Date)](https://star-history.com/#sijanstu/video-transform-studio&Date)
+![Star History](star_history.svg)
+
+> Chart is generated locally from the GitHub API (`scripts/star_chart.py`) and
+> committed to the repo, so it always renders — no third-party chart service
+> required. Re-run the script to refresh it as stars arrive.
